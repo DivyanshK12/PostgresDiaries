@@ -1,0 +1,22 @@
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+DELETE FROM Orders
+WHERE OrderID = 2
+RETURNING *;
+
+DROP TABLE IF EXISTS Order_Archive;
+
+WITH Deleted_Orders
+AS
+(
+    DELETE FROM Orders
+    WHERE OrderID = 1
+    RETURNING *
+)
+SELECT *,  NOW() AS TS, USER AS Usr
+INTO Orders_Archive
+FROM Deleted_Orders;
+
+SELECT * FROM Orders_Archive;
+
+ROLLBACK TRANSACTION;
